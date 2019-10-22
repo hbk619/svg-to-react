@@ -43,3 +43,6 @@ output: 'my/out/dir'
 ## From command line
 
 TODO
+
+Inspired by https://github.com/pedronauck/reicons#readme re-written with async/await, less dependencies, tests 
+(well there will be better tests soon).

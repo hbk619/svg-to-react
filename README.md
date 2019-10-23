@@ -32,17 +32,20 @@ To create icons:
 
 ## From node
 
-```
+```javascript 1.8
 const componentiser = require('svg-to-components');
 
-compnentiser.create({
+componentiser.create({
 src: 'my/src/dir',
 output: 'my/out/dir'
+});
 ```
 
 ## From command line
 
-TODO
+```shell script
+svg-to-react --src images --output output/dir
+```
 
 Inspired by https://github.com/pedronauck/reicons#readme re-written with async/await, less dependencies, tests 
 (well there will be better tests soon).

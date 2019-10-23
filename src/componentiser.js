@@ -24,7 +24,7 @@ const getComponent =  async (filePath, fileName) => {
 
 const create = async (config) => {
     const components = await componentise(config);
-    await createOutput('./', config.outputPath, {icons: components});
+    await createOutput(path.resolve(__dirname), config.outputPath, {icons: components});
 };
 
 const componentise = async (config) => {

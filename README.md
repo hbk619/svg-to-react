@@ -52,3 +52,10 @@ svg-to-react --help
 ```
 
 Inspired by https://github.com/pedronauck/reicons#readme re-written with async/await, less dependencies, and tests
+
+## Developing
+
+```shell script
+yarn install
+yarn test
+```

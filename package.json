@@ -8,11 +8,16 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "eslint": "^6.5.1",
+    "eslint-plugin-react": "^7.16.0",
     "mocha": "^6.2.2",
     "sinon": "^7.5.0"
   },
   "bin": {
     "svg-to-react": "./bin/svg-to-react.js"
+  },
+  "scripts": {
+    "test": "yarn lint && mocha src/**/*.test.js",
+    "lint": "eslint src/**/*.js"
   },
   "dependencies": {
     "cheerio": "^1.0.0-rc.3",

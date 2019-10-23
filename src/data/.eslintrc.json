@@ -1,0 +1,33 @@
+{
+  "env": {
+    "commonjs": false,
+    "es6": true,
+    "node": false
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended"
+  ],
+  "globals": {
+    "Atomics": "readonly",
+    "SharedArrayBuffer": "readonly",
+    "describe": "readonly",
+    "afterEach": "readonly",
+    "it": "readonly",
+    "beforeEach": "readonly"
+  },
+  "parserOptions": {
+    "ecmaVersion": 2018,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
+  "rules": {
+  },
+    "settings": {
+        "react": {
+            "version": "16"
+        }
+    }
+}

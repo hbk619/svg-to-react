@@ -54,7 +54,7 @@ describe('componentiser', () => {
         ];
 
         const expectedOutputPath = path.resolve(process.cwd(), 'test');
-        const expectedOuput = await fs.readFile('src/test-output.js');
+        const expectedOuput = await fs.readFile('src/data/test-output.js');
         await componentiser.createOutput('src', { output: 'test', filename: 'index.js'}, { icons: components });
 
         sinon.assert.calledWith(writeStub, path.resolve(expectedOutputPath, 'index.js'), expectedOuput.toString());

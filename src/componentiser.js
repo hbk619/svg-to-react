@@ -1,5 +1,4 @@
-const fs = require('fs');
-const utils = require('util');
+const fs = require('fs').promises;
 const SVGO = require('svgo');
 const path = require('path');
 const camelCase = require('lodash.camelcase');
@@ -79,12 +78,9 @@ const svgo = new SVGO({
 });
 
 const cheerio = require('cheerio');
-const readdir = utils.promisify(fs.readdir);
-const readFile = utils.promisify(fs.readFile);
-const writeFile = utils.promisify(fs.writeFile);
 
 const getComponent =  async (filePath, fileName) => {
-    const contents = await readFile(filePath);
+    const contents = await fs.readFile(filePath);
     const optimised = await svgo.optimize(contents, { path: filePath});
     const fileNameWithoutExtension = path.parse(fileName).name;
     const $ = cheerio.load(optimised.data);
@@ -103,7 +99,7 @@ const create = async (config) => {
 
 const componentise = async (config) => {
 
-    const files = await readdir(config.src);
+    const files = await fs.readdir(config.src);
 
     const promises = await files.map(fileName => {
         return getComponent(path.resolve(config.src, fileName), fileName);
@@ -116,13 +112,13 @@ const componentise = async (config) => {
 const createOutput = async (inputPath, outputPath, props) => {
     var templateSettings = require('lodash.templatesettings');
 
-    const templateContents = await readFile(`${inputPath}/template.js`);
+    const templateContents = await fs.readFile(`${inputPath}/template.js`);
     templateSettings.interpolate = /<%=([\s\S]+?)%>/g;
 
     const compiled = template(templateContents.toString());
     const output = compiled({ icons: props });
 
-    return writeFile(outputPath, output);
+    return fs.writeFile(outputPath, output);
 };
 
 module.exports = { create, componentise, createOutput };

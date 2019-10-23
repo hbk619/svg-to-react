@@ -1,11 +1,10 @@
-const mock = require('mock-fs');
 const path = require('path');
-const fs = require('fs');
+const fs = require('fs').promises;
 const expect = require('chai').expect;
 const sinon = require('sinon');
 
 describe('componentiser', () => {
-    let writeStub, readStub, readDirStub;
+    let writeStub, readStub, readDirStub, sandbox;
     const file =  '<svg height="60" width="200">\n' +
         '  <text x="0" y="15" fill="red" transform="rotate(30 20,40)">I love SVG</text>\n' +
         '  <text x="0" y="15" fill="blue" transform="rotate(130 20,140)">I love SVG</text>\n' +
@@ -16,21 +15,44 @@ describe('componentiser', () => {
         '</svg>\n';
 
     beforeEach(() => {
-        writeStub = sinon.stub(fs, 'writeFile').yields(null);
-        readDirStub = sinon.stub(fs, 'readdir').yields(null, ['some-file.svg', 'otherSvg.svg']);
-        readStub = sinon.stub(fs, 'readFile');
-        readStub.withArgs(path.resolve(process.cwd(), 'path/to/fake/dir/some-file.svg')).yields(null, file);
-        readStub.withArgs(path.resolve(process.cwd(), 'path/to/fake/dir/otherSvg.svg')).yields(null, file2);
+        sandbox = sinon.createSandbox();
+        writeStub = sandbox.stub(fs, 'writeFile').returns(Promise.resolve());
+        readDirStub = sandbox.stub(fs, 'readdir').returns(Promise.resolve(['some-file.svg', 'otherSvg.svg']));
+        readStub = sandbox.stub(fs, 'readFile');
+        readStub.withArgs(path.resolve(process.cwd(), 'path/to/fake/dir/some-file.svg')).returns(Promise.resolve(file));
+        readStub.withArgs(path.resolve(process.cwd(), 'path/to/fake/dir/otherSvg.svg')).returns(Promise.resolve(file2));
         readStub.callThrough();
     });
 
     afterEach(() => {
-        mock.restore();
+        sandbox.restore();
+    });
+
+    it('writes the template correctly',  async () => {
+        const componentiser = require('./componentiser');
+        const components = [
+
+            {
+                "name": "OtherSvg",
+                "contents": "test1",
+                "viewBox": "0 0 100 20"
+            },
+            {
+                "name": "SomeFile",
+                "contents": "<text y=\"15\" transform=\"rotate(30 20 40)\">I love SVG</text><text y=\"15\" transform=\"rotate(130 20 140)\">I love SVG</text>Sorry, your browser does not support inline SVG.",
+                "viewBox": "0 0 200 60"
+            }
+        ];
+
+        const expectedOuput = await fs.readFile('src/test-output.js');
+        await componentiser.createOutput('src', 'test/index.js', components);
+
+        sinon.assert.calledWith(writeStub, 'test/index.js', expectedOuput.toString());
     });
 
     it('should load svgs from supplied folder and create react components', async () => {
-        const compontiser = require('./componentiser');
-        const components = await compontiser.componentise({
+        const componentiser = require('./componentiser');
+        const components = await componentiser.componentise({
             src: 'path/to/fake/dir'
         });
 
@@ -47,8 +69,5 @@ describe('componentiser', () => {
         expect(otherSvgComponent.contents).to.equal('test1');
         expect(otherSvgComponent.viewBox).to.equal('0 0 100 20');
 
-        await compontiser.createOutput('src', 'test/index.js', components);
-
-        sinon.assert.calledWith(writeStub, 'test/index.js', fs.readFileSync('src/test-output.js').toString());
     });
 });

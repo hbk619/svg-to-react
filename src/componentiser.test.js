@@ -2,10 +2,11 @@ const path = require('path');
 const fs = require('fs').promises;
 const expect = require('chai').expect;
 const sinon = require('sinon');
+const assert = require('assert');
 
 describe('componentiser', () => {
     let writeStub, readStub, readDirStub, statStub, sandbox;
-    const file =  '<svg height="60" width="200">\n' +
+    const file = '<svg height="60" width="200">\n' +
         '  <text x="0" y="15" fill="red" transform="rotate(30 20,40)">I love SVG</text>\n' +
         '  <text x="0" y="15" fill="blue" transform="rotate(130 20,140)">I love SVG</text>\n' +
         '  Sorry, your browser does not support inline SVG.\n' +
@@ -35,7 +36,7 @@ describe('componentiser', () => {
         sandbox.restore();
     });
 
-    it('writes the template correctly',  async () => {
+    it('writes the template correctly', async () => {
         const componentiser = require('./componentiser');
         const components = [
 
@@ -75,6 +76,23 @@ describe('componentiser', () => {
         expect(otherSvgComponent).not.to.equal(undefined);
         expect(otherSvgComponent.contents).to.equal('test1');
         expect(otherSvgComponent.viewBox).to.equal('0 0 100 20');
+    });
 
+    it('should throw an error if no svgs found', async () => {
+        const componentiser = require('./componentiser');
+        statStub.withArgs(path.resolve(process.cwd(), 'path/to/fake/dir/mario.jpg')).returns(Promise.resolve({isFile: sinon.stub().returns(true)}));
+        statStub.withArgs(path.resolve(process.cwd(), 'path/to/fake/dir/peach.png')).returns(Promise.resolve({isFile: sinon.stub().returns(true)}));
+
+        readDirStub.returns(Promise.resolve(['mario.jpg', 'peach.png']));
+
+        await assert.rejects(async () => {
+            await componentiser.componentise({
+                src: 'path/to/fake/dir'
+            });
+        },
+            {
+                name: 'Error',
+                message: 'No svgs found!'
+            });
     });
 });

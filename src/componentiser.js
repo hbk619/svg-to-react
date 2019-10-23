@@ -36,6 +36,10 @@ const componentise = async (config) => {
     const svgFileNames = await Promise.all(statsPromises)
         .then(results => files.filter((item, index) => results[index].isFile() && item.endsWith(".svg")));
 
+    if (svgFileNames.length === 0) {
+        throw new Error('No svgs found!');
+    }
+
     const promises = await svgFileNames.map(fileName => {
         return getComponent(path.resolve(config.src, fileName), fileName);
     });

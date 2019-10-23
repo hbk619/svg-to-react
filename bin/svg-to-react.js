@@ -3,7 +3,7 @@
 const yargs = require('yargs');
 
 const options = {
-   'src': {
+    'src': {
         alias: 's',
         describe: 'Directory with the icons folder',
         type: 'string'
@@ -26,4 +26,11 @@ const argv = yargs
     .demandOption(['s', 'o'])
     .argv;
 
-require('../src/componentiser').create(argv);
+(async () => {
+    try {
+        await require('../src/componentiser').create(argv);
+    } catch (e) {
+        console.error('Failed to load svgs!');
+        console.error(e);
+    }
+})();

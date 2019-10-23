@@ -16,8 +16,9 @@
     "svg-to-react": "./bin/svg-to-react.js"
   },
   "scripts": {
+    "lint": "eslint src/**/*.js",
     "test": "yarn lint && mocha src/**/*.test.js",
-    "lint": "eslint src/**/*.js"
+    "test:command": "node bin/svg-to-react.js --src src/svgs --output build/test"
   },
   "dependencies": {
     "cheerio": "^1.0.0-rc.3",

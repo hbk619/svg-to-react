@@ -58,4 +58,5 @@ Inspired by https://github.com/pedronauck/reicons#readme re-written with async/a
 ```shell script
 yarn install
 yarn test
+yarn test:command
 ```

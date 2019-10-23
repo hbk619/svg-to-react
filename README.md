@@ -1,7 +1,5 @@
 # SVG to Components
 
-WORK IN PROGRESS NOT ACTUALLY FULLY IMPLEMENTED
-
 Turn your svg files into React components, allows for:
 
 
@@ -36,8 +34,8 @@ To create icons:
 const componentiser = require('svg-to-components');
 
 componentiser.create({
-src: 'my/src/dir',
-output: 'my/out/dir'
+    src: 'my/src/dir',
+    output: 'my/out/dir'
 });
 ```
 
@@ -47,5 +45,10 @@ output: 'my/out/dir'
 svg-to-react --src images --output output/dir
 ```
 
-Inspired by https://github.com/pedronauck/reicons#readme re-written with async/await, less dependencies, tests 
-(well there will be better tests soon).
+## More info
+
+```shell script
+svg-to-react --help
+```
+
+Inspired by https://github.com/pedronauck/reicons#readme re-written with async/await, less dependencies, and tests

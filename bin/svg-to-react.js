@@ -12,6 +12,12 @@ const options = {
         alias: 'o',
         describe: 'Where to output the code',
         type: 'string'
+    },
+    'filename': {
+        alias: 'f',
+        describe: 'Name of file to create [default: svgs.js]',
+        default: 'svgs.js',
+        type: 'string'
     }
 };
 

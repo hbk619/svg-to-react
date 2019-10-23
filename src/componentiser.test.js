@@ -5,7 +5,7 @@ const sinon = require('sinon');
 const assert = require('assert');
 
 describe('componentiser', () => {
-    let writeStub, readStub, readDirStub, statStub, sandbox;
+    let writeStub, readStub, readDirStub, statStub, mkdirStub, sandbox;
     const file = '<svg height="60" width="200">\n' +
         '  <text x="0" y="15" fill="red" transform="rotate(30 20,40)">I love SVG</text>\n' +
         '  <text x="0" y="15" fill="blue" transform="rotate(130 20,140)">I love SVG</text>\n' +
@@ -18,6 +18,7 @@ describe('componentiser', () => {
     beforeEach(() => {
         sandbox = sinon.createSandbox();
         writeStub = sandbox.stub(fs, 'writeFile').returns(Promise.resolve());
+        mkdirStub = sandbox.stub(fs, 'mkdir').returns(Promise.resolve());
         readDirStub = sandbox.stub(fs, 'readdir').returns(Promise.resolve(['some-file.svg', 'otherSvg.svg', 'test.jpg', 'some-dir.svg']));
 
         readStub = sandbox.stub(fs, 'readFile');
@@ -52,10 +53,12 @@ describe('componentiser', () => {
             }
         ];
 
+        const expectedOutputPath = path.resolve(process.cwd(), 'test');
         const expectedOuput = await fs.readFile('src/test-output.js');
-        await componentiser.createOutput('src', 'test/index.js', components);
+        await componentiser.createOutput('src', { output: 'test', filename: 'index.js'}, { icons: components });
 
-        sinon.assert.calledWith(writeStub, 'test/index.js', expectedOuput.toString());
+        sinon.assert.calledWith(writeStub, path.resolve(expectedOutputPath, 'index.js'), expectedOuput.toString());
+        sinon.assert.calledWith(mkdirStub, expectedOutputPath, { recursive: true });
     });
 
     it('should load svgs from supplied folder and create react components', async () => {
@@ -93,6 +96,21 @@ describe('componentiser', () => {
             {
                 name: 'Error',
                 message: 'No svgs found!'
+            });
+    });
+
+    it('should throw an error if input path does not exist', async () => {
+        const componentiser = require('./componentiser');
+        readDirStub.returns(Promise.reject(new Error('ENOENT: no such file or directory')));
+
+        await assert.rejects(async () => {
+            await componentiser.componentise({
+                src: 'path/to/fake/dir'
+            });
+        },
+            {
+                name: 'Error',
+                message: 'ENOENT: no such file or directory'
             });
     });
 });

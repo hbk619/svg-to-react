@@ -24,7 +24,7 @@ const getComponent =  async (filePath, fileName) => {
 
 const create = async (config) => {
     const components = await componentise(config);
-    await createOutput(path.resolve(__dirname), config.outputPath, {icons: components});
+    await createOutput(path.resolve(__dirname), config, {icons: components});
 };
 
 const componentise = async (config) => {
@@ -48,14 +48,18 @@ const componentise = async (config) => {
 
 };
 
-const createOutput = async (inputPath, outputPath, props) => {
+const createOutput = async (inputPath, config, props) => {
+    const outputPath = path.resolve(config.output, config.filename);
+
     var templateSettings = require('lodash.templatesettings');
 
     const templateContents = await fs.readFile(`${inputPath}/template.js`);
     templateSettings.interpolate = /<%=([\s\S]+?)%>/g;
 
     const compiled = template(templateContents.toString());
-    const output = compiled({ icons: props });
+    const output = compiled(props);
+
+    await fs.mkdir(path.resolve(config.output), { recursive: true });
 
     return fs.writeFile(outputPath, output);
 };

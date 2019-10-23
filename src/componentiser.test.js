@@ -4,7 +4,7 @@ const expect = require('chai').expect;
 const sinon = require('sinon');
 
 describe('componentiser', () => {
-    let writeStub, readStub, readDirStub, sandbox;
+    let writeStub, readStub, readDirStub, statStub, sandbox;
     const file =  '<svg height="60" width="200">\n' +
         '  <text x="0" y="15" fill="red" transform="rotate(30 20,40)">I love SVG</text>\n' +
         '  <text x="0" y="15" fill="blue" transform="rotate(130 20,140)">I love SVG</text>\n' +
@@ -17,11 +17,18 @@ describe('componentiser', () => {
     beforeEach(() => {
         sandbox = sinon.createSandbox();
         writeStub = sandbox.stub(fs, 'writeFile').returns(Promise.resolve());
-        readDirStub = sandbox.stub(fs, 'readdir').returns(Promise.resolve(['some-file.svg', 'otherSvg.svg']));
+        readDirStub = sandbox.stub(fs, 'readdir').returns(Promise.resolve(['some-file.svg', 'otherSvg.svg', 'test.jpg', 'some-dir.svg']));
+
         readStub = sandbox.stub(fs, 'readFile');
         readStub.withArgs(path.resolve(process.cwd(), 'path/to/fake/dir/some-file.svg')).returns(Promise.resolve(file));
         readStub.withArgs(path.resolve(process.cwd(), 'path/to/fake/dir/otherSvg.svg')).returns(Promise.resolve(file2));
         readStub.callThrough();
+
+        statStub = sandbox.stub(fs, 'stat');
+        statStub.withArgs(path.resolve(process.cwd(), 'path/to/fake/dir/some-file.svg')).returns(Promise.resolve({isFile: sinon.stub().returns(true)}));
+        statStub.withArgs(path.resolve(process.cwd(), 'path/to/fake/dir/otherSvg.svg')).returns(Promise.resolve({isFile: sinon.stub().returns(true)}));
+        statStub.withArgs(path.resolve(process.cwd(), 'path/to/fake/dir/test.jpg')).returns(Promise.resolve({isFile: sinon.stub().returns(true)}));
+        statStub.withArgs(path.resolve(process.cwd(), 'path/to/fake/dir/some-dir.svg')).returns(Promise.resolve({isFile: sinon.stub().returns(false)}));
     });
 
     afterEach(() => {

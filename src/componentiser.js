@@ -31,7 +31,12 @@ const componentise = async (config) => {
 
     const files = await fs.readdir(config.src);
 
-    const promises = await files.map(fileName => {
+    const statsPromises = await files.map((fileName) => fs.stat(path.resolve(config.src, fileName)));
+
+    const svgFileNames = await Promise.all(statsPromises)
+        .then(results => files.filter((item, index) => results[index].isFile() && item.endsWith(".svg")));
+
+    const promises = await svgFileNames.map(fileName => {
         return getComponent(path.resolve(config.src, fileName), fileName);
     });
 

@@ -2,6 +2,14 @@
   "name": "svg-to-components",
   "version": "0.0.1",
   "description": "Turn svgs in a folder into React components",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hbk619/svg-to-react"
+  },
+  "bugs": {
+    "url": "https://github.com/hbk619/svg-to-react/issues"
+  },
+  "homepage": "https://github.com/hbk619/svg-to-react#readme",
   "main": "index.js",
   "license": "MIT",
   "private": true,

@@ -60,3 +60,7 @@ yarn install
 yarn test
 yarn test:command
 ```
+
+## TODO
+
+Make it recursive (optionally)
